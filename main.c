@@ -41,8 +41,10 @@ void printTask(struct Task *task)
 }
 
 // Hàm in ra tất cả các công việc trong mảng
-void printAllTasks(struct Task *array_tasks, int no_tasks) {
-    for (int i = 0; i < no_tasks; ++i) {
+void printAllTasks(struct Task *array_tasks, int no_tasks)
+{
+    for (int i = 0; i < no_tasks; ++i)
+    {
         printTask(&array_tasks[i]);
     }
 }
@@ -57,8 +59,8 @@ bool addTask(struct Task *array_tasks, int *no_tasks, char *new_title, char *new
         strcpy(array_tasks[*no_tasks].date, new_time);
 
         // Gán giá trị cho các biến thành viên tương ứng (num và status)
-        array_tasks[*no_tasks].num = *no_tasks + 1; // Ví dụ: Số công việc có thể được thiết lập là số thứ tự của công việc
-        array_tasks[*no_tasks].status = IN_PROGRESS;       // Ví dụ: Mặc định là công việc chưa hoàn thành
+        array_tasks[*no_tasks].num = *no_tasks + 1;  // Ví dụ: Số công việc có thể được thiết lập là số thứ tự của công việc
+        array_tasks[*no_tasks].status = IN_PROGRESS; // Ví dụ: Mặc định là công việc chưa hoàn thành
         (*no_tasks)++;
         return true;
     }
@@ -139,40 +141,46 @@ CommandType parseCommand(char *command)
     }
 }
 
-void getTitleFromAdd(char *command, char *out_title) {
+void getTitleFromAdd(char *command, char *out_title)
+{
     // Tìm vị trí của dấu ngoặc vuông đầu tiên và cuối cùng
     char *start = strchr(command, '[');
     char *end = strchr(command, ']');
 
     // Kiểm tra xem có dấu ngoặc vuông hay không và lấy nội dung bên trong
-    if (start != NULL && end != NULL) {
+    if (start != NULL && end != NULL)
+    {
         strncpy(out_title, start + 1, end - start - 1);
         out_title[end - start - 1] = '\0'; // Kết thúc chuỗi
     }
 }
 
-void getDescriptionFromAdd(char *command, char *out_description) {
+void getDescriptionFromAdd(char *command, char *out_description)
+{
     // Tìm vị trí của dấu ngoặc vuông thứ hai và thứ ba
     char *start = strchr(command, '[');
-    start = strchr(start + 1, '[');  // Tìm dấu ngoặc vuông thứ hai
+    start = strchr(start + 1, '['); // Tìm dấu ngoặc vuông thứ hai
     char *end = strchr(start, ']');
 
     // Kiểm tra xem có dấu ngoặc vuông thứ hai và thứ ba hay không và lấy nội dung bên trong
-    if (start != NULL && end != NULL) {
+    if (start != NULL && end != NULL)
+    {
         strncpy(out_description, start + 1, end - start - 1);
         out_description[end - start - 1] = '\0'; // Kết thúc chuỗi
     }
 }
 
-void getTimeFromAdd(char *command, char *out_time) {
+void getTimeFromAdd(char *command, char *out_time)
+{
     // Tìm vị trí của dấu ngoặc vuông thứ ba và thứ tư
     char *start = strchr(command, '[');
-    start = strchr(start + 1, '[');  // Tìm dấu ngoặc vuông thứ hai
-    start = strchr(start + 1, '[');  // Tìm dấu ngoặc vuông thứ ba
+    start = strchr(start + 1, '['); // Tìm dấu ngoặc vuông thứ hai
+    start = strchr(start + 1, '['); // Tìm dấu ngoặc vuông thứ ba
     char *end = strchr(start, ']');
 
     // Kiểm tra xem có dấu ngoặc vuông thứ ba và thứ tư hay không và lấy nội dung bên trong
-    if (start != NULL && end != NULL) {
+    if (start != NULL && end != NULL)
+    {
         strncpy(out_time, start + 1, end - start - 1);
         out_time[end - start - 1] = '\0'; // Kết thúc chuỗi
     }
@@ -184,52 +192,63 @@ int main()
 
     char command[100];
 
+    // char command[] = "Add [Course Intro to Programming] [Room 701-H6] [07:00|01/10/2023-12:00|01/10/2023] ";
+    char raw_title[200];
+    char raw_description[200];
+    char raw_time[200];
+    getTitleFromAdd(command, raw_title);
+    getDescriptionFromAdd(command, raw_description);
+    getTimeFromAdd(command, raw_time);
+    puts(raw_title);
+    puts(raw_description);
+    puts(raw_time);
+
     // Vòng lặp chính của ứng dụng
-    while (true)
-    {
-        printf("Enter a command: ");
-        fgets(command, sizeof(command), stdin);
+    // while (true)
+    // {
+    //     printf("Enter a command: ");
+    //     fgets(command, sizeof(command), stdin);
 
-        // Loại bỏ ký tự xuống dòng từ chuỗi command
-        command[strcspn(command, "\n")] = 0;
+    //     // Loại bỏ ký tự xuống dòng từ chuỗi command
+    //     command[strcspn(command, "\n")] = 0;
 
-        // Phân tích lệnh và thực hiện các hàm tương ứng
-        CommandType cmdType = parseCommand(command);
+    //     // Phân tích lệnh và thực hiện các hàm tương ứng
+    //     CommandType cmdType = parseCommand(command);
 
-        switch (cmdType)
-        {
-        case ADD:
-            // Thực hiện lệnh Add
-            // Ví dụ: Add [Title] [Description] [Time]
-            addTask(tasks, &numTasks, "Title", "Description", "Time");
-            break;
-        case EDIT:
-            // Thực hiện lệnh Edit
-            // Ví dụ: Edit #1 title:[New Title]
-            // ...
-            break;
-        case SHOW:
-            // Thực hiện lệnh Show
-            // Ví dụ: Show all
-            for (size_t i = 0; i < numTasks; i++)
-            {
-                printTask(&tasks[i]);
-            }
-            
-            // ...
-            break;
-        case DELETE:
-            // Thực hiện lệnh Delete
-            // Ví dụ: Delete #1
-            // ...
-            break;
-        case QUIT:
-            // Thoát khỏi ứng dụng
-            exit(0);
-        default:
-            break;
-        }
-    }
+    //     switch (cmdType)
+    //     {
+    //     case ADD:
+    //         // Thực hiện lệnh Add
+    //         // Ví dụ: Add [Title] [Description] [Time]
+    //         addTask(tasks, &numTasks, "Title", "Description", "Time");
+    //         break;
+    //     case EDIT:
+    //         // Thực hiện lệnh Edit
+    //         // Ví dụ: Edit #1 title:[New Title]
+    //         // ...
+    //         break;
+    //     case SHOW:
+    //         // Thực hiện lệnh Show
+    //         // Ví dụ: Show all
+    //         for (size_t i = 0; i < numTasks; i++)
+    //         {
+    //             printTask(&tasks[i]);
+    //         }
+
+    //         // ...
+    //         break;
+    //     case DELETE:
+    //         // Thực hiện lệnh Delete
+    //         // Ví dụ: Delete #1
+    //         // ...
+    //         break;
+    //     case QUIT:
+    //         // Thoát khỏi ứng dụng
+    //         exit(0);
+    //     default:
+    //         break;
+    //     }
+    // }
 
     return 0;
 }
