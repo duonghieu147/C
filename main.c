@@ -15,12 +15,6 @@ struct Task
     char date[20];
 };
 
-// struct TaskList
-// {
-//     struct Task tasks[MAX_TASKS];
-//     int count;
-// };
-
 // Định nghĩa các kiểu lệnh
 typedef enum
 {
@@ -34,10 +28,24 @@ typedef enum
 // Định nghĩa các trạng thái công việc
 typedef enum
 {
-    TODO,
-    INPROCESS,
-    DONE
+    IN_PROGRESS,
+    DONE,
+    ARCHIVED
 } StatusType;
+
+void printTask(struct Task *task)
+{
+    printf("Title: %s\n", task->title);
+    printf("Description: %s\n", task->description);
+    printf("Date: %s\n", task->date);
+}
+
+// Hàm in ra tất cả các công việc trong mảng
+void printAllTasks(struct Task *array_tasks, int no_tasks) {
+    for (int i = 0; i < no_tasks; ++i) {
+        printTask(&array_tasks[i]);
+    }
+}
 
 // Hàm thêm một công việc mới vào mảng công việc
 bool addTask(struct Task *array_tasks, int *no_tasks, char *new_title, char *new_description, char *new_time)
@@ -50,7 +58,7 @@ bool addTask(struct Task *array_tasks, int *no_tasks, char *new_title, char *new
 
         // Gán giá trị cho các biến thành viên tương ứng (num và status)
         array_tasks[*no_tasks].num = *no_tasks + 1; // Ví dụ: Số công việc có thể được thiết lập là số thứ tự của công việc
-        array_tasks[*no_tasks].status = TODO;       // Ví dụ: Mặc định là công việc chưa hoàn thành
+        array_tasks[*no_tasks].status = IN_PROGRESS;       // Ví dụ: Mặc định là công việc chưa hoàn thành
         (*no_tasks)++;
         return true;
     }
@@ -218,12 +226,6 @@ CommandType parseCommand(char *command)
 //     out_time[time_end - time_start] = '\0';
 // }
 
-// void printTask(struct Task *task)
-// {
-//     printf("Title: %s\n", task->title);
-//     printf("Description: %s\n", task->description);
-//     printf("Date: %s\n", task->date);
-// }
 
 int main()
 {
@@ -250,7 +252,6 @@ int main()
             // Thực hiện lệnh Add
             // Ví dụ: Add [Title] [Description] [Time]
             addTask(tasks, &numTasks, "Title", "Description", "Time");
-
             break;
         case EDIT:
             // Thực hiện lệnh Edit
@@ -260,12 +261,12 @@ int main()
         case SHOW:
             // Thực hiện lệnh Show
             // Ví dụ: Show all
+            for (size_t i = 0; i < numTasks; i++)
+            {
+                printTask(&tasks[i]);
+            }
+            
             // ...
-            // for (int i = 0; i < numTasks; ++i)
-            // {
-            //     printf("\nEvent %d:\n", i + 1);
-            //     printTask(&tasks[i]);
-            // }
             break;
         case DELETE:
             // Thực hiện lệnh Delete
