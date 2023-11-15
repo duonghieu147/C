@@ -18,9 +18,9 @@ struct Task
 // Định nghĩa các kiểu lệnh
 typedef enum
 {
-    SHOW,
     ADD,
     EDIT,
+    SHOW,
     DELETE,
     QUIT,
     INVALID
@@ -139,94 +139,44 @@ CommandType parseCommand(char *command)
     }
 }
 
-// void getTitleFromAdd(char *command, char *out_title)
-// {
-//     // Tìm vị trí của <title> trong chuỗi command
-//     char *title_start = strstr(command, "<title>");
+void getTitleFromAdd(char *command, char *out_title) {
+    // Tìm vị trí của dấu ngoặc vuông đầu tiên và cuối cùng
+    char *start = strchr(command, '[');
+    char *end = strchr(command, ']');
 
-//     // Nếu không tìm thấy, đặt out_title thành chuỗi rỗng
-//     if (title_start == NULL)
-//     {
-//         strcpy(out_title, "");
-//         return;
-//     }
+    // Kiểm tra xem có dấu ngoặc vuông hay không và lấy nội dung bên trong
+    if (start != NULL && end != NULL) {
+        strncpy(out_title, start + 1, end - start - 1);
+        out_title[end - start - 1] = '\0'; // Kết thúc chuỗi
+    }
+}
 
-//     // Di chuyển con trỏ đến vị trí bắt đầu của tiêu đề và tìm vị trí kết thúc
-//     title_start += strlen("<title>");
-//     char *title_end = strstr(title_start, "</title>");
+void getDescriptionFromAdd(char *command, char *out_description) {
+    // Tìm vị trí của dấu ngoặc vuông thứ hai và thứ ba
+    char *start = strchr(command, '[');
+    start = strchr(start + 1, '[');  // Tìm dấu ngoặc vuông thứ hai
+    char *end = strchr(start, ']');
 
-//     // Nếu không tìm thấy kết thúc, đặt out_title thành chuỗi rỗng
-//     if (title_end == NULL)
-//     {
-//         strcpy(out_title, "");
-//         return;
-//     }
+    // Kiểm tra xem có dấu ngoặc vuông thứ hai và thứ ba hay không và lấy nội dung bên trong
+    if (start != NULL && end != NULL) {
+        strncpy(out_description, start + 1, end - start - 1);
+        out_description[end - start - 1] = '\0'; // Kết thúc chuỗi
+    }
+}
 
-//     // Sao chép tiêu đề vào out_title
-//     strncpy(out_title, title_start, title_end - title_start);
-//     // Kết thúc chuỗi out_title
-//     out_title[title_end - title_start] = '\0';
-// }
+void getTimeFromAdd(char *command, char *out_time) {
+    // Tìm vị trí của dấu ngoặc vuông thứ ba và thứ tư
+    char *start = strchr(command, '[');
+    start = strchr(start + 1, '[');  // Tìm dấu ngoặc vuông thứ hai
+    start = strchr(start + 1, '[');  // Tìm dấu ngoặc vuông thứ ba
+    char *end = strchr(start, ']');
 
-// void getDescriptionFromAdd(char *command, char *out_description)
-// {
-//     // Tìm vị trí của <description> trong chuỗi command
-//     char *desc_start = strstr(command, "<description>");
-
-//     // Nếu không tìm thấy, đặt out_description thành chuỗi rỗng
-//     if (desc_start == NULL)
-//     {
-//         strcpy(out_description, "");
-//         return;
-//     }
-
-//     // Di chuyển con trỏ đến vị trí bắt đầu của mô tả và tìm vị trí kết thúc
-//     desc_start += strlen("<description>");
-//     char *desc_end = strstr(desc_start, "</description>");
-
-//     // Nếu không tìm thấy kết thúc, đặt out_description thành chuỗi rỗng
-//     if (desc_end == NULL)
-//     {
-//         strcpy(out_description, "");
-//         return;
-//     }
-
-//     // Sao chép mô tả vào out_description
-//     strncpy(out_description, desc_start, desc_end - desc_start);
-//     // Kết thúc chuỗi out_description
-//     out_description[desc_end - desc_start] = '\0';
-// }
-
-// void getTimeFromAdd(char *command, char *out_time)
-// {
-//     // Tìm vị trí của <time> trong chuỗi command
-//     char *time_start = strstr(command, "<time>");
-
-//     // Nếu không tìm thấy, đặt out_time thành chuỗi rỗng
-//     if (time_start == NULL)
-//     {
-//         strcpy(out_time, "");
-//         return;
-//     }
-
-//     // Di chuyển con trỏ đến vị trí bắt đầu của thời gian và tìm vị trí kết thúc
-//     time_start += strlen("<time>");
-//     char *time_end = strstr(time_start, "</time>");
-
-//     // Nếu không tìm thấy kết thúc, đặt out_time thành chuỗi rỗng
-//     if (time_end == NULL)
-//     {
-//         strcpy(out_time, "");
-//         return;
-//     }
-
-//     // Sao chép thời gian vào out_time
-//     strncpy(out_time, time_start, time_end - time_start);
-//     // Kết thúc chuỗi out_time
-//     out_time[time_end - time_start] = '\0';
-// }
-
-
+    // Kiểm tra xem có dấu ngoặc vuông thứ ba và thứ tư hay không và lấy nội dung bên trong
+    if (start != NULL && end != NULL) {
+        strncpy(out_time, start + 1, end - start - 1);
+        out_time[end - start - 1] = '\0'; // Kết thúc chuỗi
+    }
+}
 int main()
 {
     struct Task tasks[MAX_TASKS];
