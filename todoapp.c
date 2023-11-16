@@ -61,48 +61,31 @@ void printUnsupportedTime(struct Task *task)
 
 // ------ Begin: Student Answer ------
 
-void convertToUppercase(char *str)
-{
-    int i = 0;
-    while (str[i] != '\0')
-    {
-        str[i] = toupper(str[i]);
-        i++;
-    }
-}
-
 enum CommandType getCommandType(char *command)
 {
-    char *firstWord;
 
-    firstWord = strtok(command, " ");
-    // convertToUppercase(firstWord);
-    if (firstWord != NULL) { 
-        if (strcmp(firstWord, "Add") == 0)
-        {
-            return ADD;
-        }
-        else if (strcmp(firstWord, "Edit") == 0)
-        {
-            return EDIT;
-        }
-        else if (strcmp(firstWord, "Show") == 0)
-        {
-            return SHOW;
-        }
-        else if (strcmp(firstWord, "Delete") == 0)
-        {
-            return DELETE;
-        }
-        else if (strcmp(firstWord, "Quit") == 0)
-        {
-            return QUIT;
-        } else {
-            return INVALID;
-        }
-    }
-    else
+    char *first = strdup(command);
+    char *token = strtok(first, " ");
+    if (strcmp(token, "Add") == 0)
     {
+        return ADD;
+    }
+    else if (strcmp(token, "Edit") == 0)
+    {
+        return EDIT;
+    }
+    else if(strcmp(token, "Show") == 0)
+    {
+        return SHOW;
+    }
+    else if (strcmp(token, "Delete") == 0)
+    {
+        return DELETE;
+    }
+    else if (strcmp(token, "Quit") == 0)
+    {
+        return QUIT;
+    } else {
         return INVALID;
     }
 }
@@ -293,8 +276,10 @@ int getNumFromCommand(char *command)
     return num;
 }
 int getFieldFromEdit(char *edit_cmd)
-{
-    char *token = strtok(edit_cmd, " ");
+{   
+    char *copied_edit_cmd = strdup(edit_cmd);
+    char *token = strtok(copied_edit_cmd, " ");
+
 
     for (int i = 0; i < 2 && token != NULL; i++) {
         token = strtok(NULL, " ");
