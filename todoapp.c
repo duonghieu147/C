@@ -153,15 +153,6 @@ int checkTitle(char *raw_title)
         return length - 1;
     }
 
-    // if (isspace(raw_title[length - 1])) {
-    //     for (int i = length - 1 ; i >=0 ; i--)
-    //     {
-    //         if (isspace(raw_title[length - 1])) {
-    //             return i;
-    //         }    
-    //     }
-        
-    // }
 
     for (int i = 0; i < length; i++)
     {
@@ -213,13 +204,113 @@ int checkDescription(char *raw_description)
     return -1;
 }
 
-int isValidTime(int hour, int minute)
-{
-    return (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59);
+int isValid(int hh, int mm,int  dd, int mo, int yyyy) {
+    if (hh < 0 || hh > 23) {
+        return  11;
+    }
+    if (mm < 0 || mm > 59) {
+        return 21;
+    }
+    if (dd < 1 || dd > 31) {
+        return 31 ;
+    }
+    if (mo < 1 || mo > 12) {
+        return 41 ;
+    }
+    if (yyyy <= 0) {
+        return 51 ;
+    }
+    if ((mo == 4 || mo == 6 || mo == 9 || mo == 11) && dd > 30) {
+        return 41 ;
+    }
+    if (mo == 2) {
+        if ((yyyy % 4 == 0 && yyyy % 100 != 0) || (yyyy % 400 == 0)) {
+            // Năm nhuận
+            if (dd > 29) {
+                return 41;
+            }
+        } else {
+            // Năm không nhuận
+            if (dd > 28) {
+                return 41 ;
+            }
+        }
+    }
+    return -1;
 }
-
+int isCondition3(
+        int datetime1_hour,int datetime1_minute,int datetime1_day, int datetime1_month,int  datetime1_year,
+    int datetime2_hour,int  datetime2_minute,int  datetime2_day,int  datetime2_month,int  datetime2_year) {
+    if (datetime2_year < datetime1_year ||
+        (datetime2_year == datetime1_year &&
+         (datetime2_month < datetime1_month ||
+          (datetime2_month == datetime1_month &&
+           (datetime2_day < datetime1_day ||
+            (datetime2_day == datetime1_day &&
+             (datetime2_hour < datetime1_hour ||
+              (datetime2_hour == datetime1_hour && datetime2_minute < datetime1_minute)))))))) {
+        return 0; 
+    }
+}
+int concatenateIntegers(int a, int b) {
+    char strA[10], strB[10];
+    sprintf(strA, "%d", a);
+    sprintf(strB, "%d", b);
+    strcat(strA, strB);
+    int result = atoi(strA);
+    return result;
+}
 int checkTime(char *raw_time)
 {
+    int hh1, mm1, dd1, mo1, yy1;
+    int hh2, mm2, dd2, mo2, yy2;
+
+    // Đọc giá trị datetime1 từ raw_time
+    sscanf(raw_time, "%d:%d|%d/%d/%d-%d:%d|%d/%d/%d",
+           &hh1, &mm1, &dd1, &mo1, &yy1,
+           &hh2, &mm2, &dd2, &mo2, &yy2);
+    
+    char isTrueTime1 = isValid(hh1,mm1,dd1,mo1,yy1);
+    if (isTrueTime1 > 0 ) {
+        if (isTrueTime1 == 11) {
+            return concatenateIntegers(isTrueTime1,hh1);
+        }
+        if (isTrueTime1 == 21) {
+            return concatenateIntegers(isTrueTime1,mm1);
+        }
+        if (isTrueTime1 == 31) {
+            return concatenateIntegers(isTrueTime1,dd1);
+        }
+        if (isTrueTime1 == 41) {
+            return concatenateIntegers(isTrueTime1,mo1);
+        }
+        if (isTrueTime1 == 51) {
+            return concatenateIntegers(isTrueTime1,yy1);
+        }
+    }
+    char isTrueTime2 = isValid(hh2,mm2,dd2,mo2,yy2);
+    if (isTrueTime2 > 0 ) {
+        if (isTrueTime2 == 11) {
+            return concatenateIntegers(isTrueTime2 +1,hh2);
+        }
+        if (isTrueTime2 == 21) {
+            return concatenateIntegers(isTrueTime2 +1,mm2);
+        }
+        if (isTrueTime2 == 31) {
+            return concatenateIntegers(isTrueTime2 +1,dd2);
+        }
+        if (isTrueTime2 == 41) {
+            return concatenateIntegers(isTrueTime2 +1,mo2);
+        }
+        if (isTrueTime2 == 51) {
+            return concatenateIntegers(isTrueTime2 +1,yy2);
+        }
+    }
+
+    int isTrueDK3 =  isCondition3(hh1,mm1,dd1,mo1,yy1,hh2,mm2,dd2,mo2,yy2);
+    if (isTrueDK3== 0) {
+        return 0;
+    }
     return -1;
 }
 
@@ -363,18 +454,18 @@ void printFilteredTasksByStatus(struct Task *array_tasks, int no_tasks, enum Sta
     }
 }
 
-bool addTask(struct Task *array_tasks, int *no_tasks, char *new_title, char *new_description, char *new_time)
+bool addTask(struct Task *array_tasks, int no_tasks, char *new_title, char *new_description, char *new_time)
 {
-    if (*no_tasks < MAX_NO_TASKS)
+    if (no_tasks < MAX_NO_TASKS && checkTitle(new_title) == -1 && checkDescription(new_description) == -1&& checkTime(new_time) == -1)
     {
-        strcpy(array_tasks[*no_tasks].title, new_title);
-        strcpy(array_tasks[*no_tasks].description, new_description);
-        strcpy(array_tasks[*no_tasks].time, new_time);
+        strcpy(array_tasks[no_tasks].title, new_title);
+        strcpy(array_tasks[no_tasks].description, new_description);
+        strcpy(array_tasks[no_tasks].time, new_time);
 
         // Gán giá trị cho các biến thành viên tương ứng (num và status)
-        array_tasks[*no_tasks].num = *no_tasks + 1;  // Ví dụ: Số công việc có thể được thiết lập là số thứ tự của công việc
-        array_tasks[*no_tasks].status = IN_PROGRESS; // Ví dụ: Mặc định là công việc chưa hoàn thành
-        (*no_tasks)++;
+        array_tasks[no_tasks].num = no_tasks + 1;  // Ví dụ: Số công việc có thể được thiết lập là số thứ tự của công việc
+        array_tasks[no_tasks].status = IN_PROGRESS; // Ví dụ: Mặc định là công việc chưa hoàn thành
+        (no_tasks)++;
         return true;
     }
     else
@@ -383,11 +474,11 @@ bool addTask(struct Task *array_tasks, int *no_tasks, char *new_title, char *new
     }
 }
 // Hàm xóa một công việc từ mảng công việc
-bool deleteTask(struct Task *array_tasks, int *no_tasks, int num)
+bool deleteTask(struct Task *array_tasks, int no_tasks, int num)
 {
     // Tìm vị trí của công việc có số num trong mảng
     int index = -1;
-    for (int i = 0; i < *no_tasks; ++i)
+    for (int i = 0; i < no_tasks; ++i)
     {
         if (array_tasks[i].num == num)
         {
@@ -400,16 +491,16 @@ bool deleteTask(struct Task *array_tasks, int *no_tasks, int num)
     if (index != -1)
     {
         // Dời các công việc phía sau công việc cần xóa để lấp đầy vị trí đã xóa
-        for (int i = index; i < *no_tasks - 1; ++i)
+        for (int i = index; i < no_tasks - 1; ++i)
         {
             array_tasks[i] = array_tasks[i + 1];
         }
 
         // Giảm số lượng công việc trong mảng
-        (*no_tasks)--;
+        (no_tasks)--;
 
         // Cập nhật lại số của các công việc phía sau
-        for (int i = index; i < *no_tasks; ++i)
+        for (int i = index; i < no_tasks; ++i)
         {
             array_tasks[i].num = i + 1;
         }
@@ -425,7 +516,7 @@ bool deleteTask(struct Task *array_tasks, int *no_tasks, int num)
 }
 int printWeekTime(struct Task *array_tasks, int no_tasks, char *date)
 {
-    return -1;
+    return -1; // Trả về -1 để thể hiện rằng công việc đã được in theo tuần
 }
 // Other functions
 
@@ -433,22 +524,23 @@ int printWeekTime(struct Task *array_tasks, int no_tasks, char *date)
 
 void runTodoApp()
 {
-    // Example of command Add
-    char command[MAX_LENGTH_COMMAND + 1];
-
-    while (true)
-    {
-        // Sample input:
-        // Add [Course Intro to Programming] [Room 701-H6] [07:00|01/10/2023-12:00|01/10/2023]
-        fgets(command, MAX_LENGTH_COMMAND + 1, stdin);
-        command[strlen(command) - 1] = '\0';
-
-        enum CommandType commandType = getCommandType(command);
-        printf("Command     : %s\n", command);
-        printf("Command type: %s\n", command_name[commandType]);
-
-        break; // only one loop for simple test
-               // actual app will break when encounter QUIT command
+    printf("----- Sample testcase 20 -----\n");
+    printf("Test deleteTask:\n");
+    struct Task array_tasks[5] = { // extra slot for new task, 6 should be replaced by MAX_NO_TASKS
+        {1, "Course Intro to Programming - apple", "Room 701-H6 - orange", "07:00|01/10/2023-12:00|01/10/2023", IN_PROGRESS},
+        {2, "Course Intro to Programming - banana", "Room 701-H6 - apple", "07:00|01/10/2023-12:00|01/10/2023", DONE},
+        {3, "Course Intro to Programming - apple", "Room 701-H6 - orange", "07:00|01/10/2023-12:00|01/10/2023", ARCHIVED},
+        {4, "Course Intro to Programming - banana", "Room 701-H6 - orange", "07:00|01/10/2023-12:00|01/10/2023", IN_PROGRESS},
+        {5, "Course Intro to Programming - apple", "Room 701-H6 - banana", "07:00|01/10/2023-12:00|01/10/2023", DONE},
+    };
+    int no_tasks = 5;
+    if (deleteTask(array_tasks, 5, 3)) {
+        --no_tasks;
+        printf("Delete task successfully\n");
+        printAllTasks(array_tasks, no_tasks);
+    }
+    else {
+        printf("Delete task failed\n");
     }
 }
 
