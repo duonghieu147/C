@@ -360,6 +360,9 @@ int getNumFromCommand(char *command)
     }
 
     int num = atoi(hashPos + 1);
+    if (num <=0)  {
+        return 0;
+    }
     if (num == 0 && !(hashPos[1] == '0' && hashPos[2] == '\0')) {
         return 0;
     }
@@ -392,8 +395,33 @@ int getFieldFromEdit(char *edit_cmd)
 
 }
 enum Status getStatusFromEdit(char *edit_cmd)
-{
-    return IN_PROGRESS;
+{   
+    // Tìm vị trí của chuỗi "status:[" trong câu lệnh Edit
+    char *statusPos = strstr(edit_cmd, "status:[");
+
+    // Nếu không tìm thấy chuỗi "status:[", trả về giá trị mặc định IN_PROGRESS
+    if (statusPos == NULL) {
+        return IN_PROGRESS;
+    }
+
+    // Di chuyển con trỏ đến phần bắt đầu của giá trị trạng thái
+    statusPos += strlen("status:[");
+
+    // Lấy giá trị trạng thái từ chuỗi edit_cmd
+    char statusStr[20];
+    sscanf(statusPos, "%[^]]", statusStr);
+
+    // So sánh giá trị trạng thái và trả về enum tương ứng
+    if ((strcmp(statusStr, "I") == 0) || (strcmp(statusStr, "i") == 0)) {
+        return IN_PROGRESS;
+    } else if ((strcmp(statusStr, "D") == 0) || (strcmp(statusStr, "d") == 0)) {
+        return DONE;
+    } else if ((strcmp(statusStr, "A") == 0) || (strcmp(statusStr, "a") == 0)) {
+        return ARCHIVED;
+    }else {
+        // Trạng thái không hợp lệ, trả về giá trị mặc định IN_PROGRESS
+        return IN_PROGRESS;
+    }
 }
 void printAllTasks(struct Task *array_tasks, int no_tasks)
 {
